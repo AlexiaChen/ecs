@@ -8,28 +8,39 @@ import (
 	"sort"
 )
 
+const (
+	CreateHostAPI                 = "/api/interimCreate"
+	DeleteHostAPI                 = "/api/delVps"
+	GetHostStatusAPI              = "/api/getCloudStatus"
+	SetFirewallAPI                = "/lan/cloud/defaultAclRuleSet"
+	SetFirewallIPBlackWhiteAPI    = ""
+	DeleteFirewallIPBlackWhiteAPI = ""
+)
+
 type ECS struct {
-	UserId      uint
-	Id          uint
-	Cpu         uint32 //cpu核心数
-	Memory      uint32 //内存大小
-	Bandwidth   uint32 //带宽 后续换成iops
-	HardDisks   uint32 //系统盘大小
-	Disks       uint32 //数据盘大小
-	Defense     string //防御值
-	Months      uint32 //有效期月数
-	NodeId      uint32 //节点ID
-	ServerId    string //区域ID
-	SystemId    string //系统版本id
-	SystemType  string //系统类型 Centos：7 Ubuntu：8
+	UserId   uint
+	UserName string
+
+	Id         uint
+	RegionId   string //区域ID
+	NodeId     uint32 //节点ID
+	SystemId   string //系统版本id
+	SystemType string //系统类型 Centos：7 Ubuntu：8
+
+	Cpu       uint32 //cpu核心数
+	Memory    uint32 //内存大小
+	Bandwidth uint32 //带宽 后续换成iops
+	HardDisks uint32 //系统盘大小
+	Disks     uint32 //数据盘大小
+	Defense   string //防御值
+	Months    uint32 //有效期月数
+
 	DiskType    string //磁盘类型
 	IsIntranet  uint8  //是否为内网IP 1内网
 	ProductType uint8  //产品类型  1 rds，2 redis
 
-	SignSecret   string
-	CreateAPIUrl string
-	StatusAPIUrl string
-	DeleteAPIUrl string
+	APIUriPrefix  string
+	APISignSecret string
 }
 
 type Response struct {

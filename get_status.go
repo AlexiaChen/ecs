@@ -21,12 +21,12 @@ func (e *ECS) GetStatus() (*Response, int8) {
 	response := new(Response)
 	times := time.Now().Unix()
 	randStr := guid.S()
-	text := fmt.Sprintf("%d%s%s", times, randStr, e.SignSecret)
+	text := fmt.Sprintf("%d%s%s", times, randStr, e.APISignSecret)
 	newText := sorts(text)
 	ciphertext := gmd5.MustEncryptString(newText)
 	url := fmt.Sprintf(
 		"%s?%s=%s&%s=%s&%s=%s&%s=%d",
-		e.StatusAPIUrl,
+		e.APIUriPrefix+GetHostStatusAPI,
 		"time_stamp",
 		fmt.Sprintf("%d", times),
 		"nonce_str",

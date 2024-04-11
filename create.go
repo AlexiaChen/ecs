@@ -14,7 +14,7 @@ import (
 func (e *ECS) Create() (*Response, error) {
 	times := time.Now().Unix()
 	randStr := guid.S()
-	text := fmt.Sprintf("%d%s%s", times, randStr, e.SignSecret)
+	text := fmt.Sprintf("%d%s%s", times, randStr, e.APISignSecret)
 	newText := sorts(text)
 	ciphertext := gmd5.MustEncryptString(newText)
 	diskMap, hardDiskSize := getHardDisks(e.Disks, e.HardDisks)
@@ -22,7 +22,8 @@ func (e *ECS) Create() (*Response, error) {
 		"time_stamp":   fmt.Sprintf("%d", times),
 		"nonce_str":    randStr,
 		"sign":         ciphertext,
-		"serverid":     e.ServerId,
+		"serverid":     e.RegionId,
+		"nodeid":       fmt.Sprint(e.NodeId), //129,130,131 研发集群
 		"months":       e.Months,
 		"system_type":  e.SystemType,
 		"systemid":     e.SystemId,
@@ -33,13 +34,12 @@ func (e *ECS) Create() (*Response, error) {
 		"harddisks":    hardDiskSize,
 		"disks":        diskMap,
 		"defense":      e.Defense,
-		"nodeid":       fmt.Sprint(e.NodeId), //129,130,131 研发集群
 		"userid":       e.UserId,
 		"is_intranet":  fmt.Sprint(e.IsIntranet),  //为1代表是内网ip
 		"product_type": fmt.Sprint(e.ProductType), //rds的标识 redis 2 云防火墙
 	}
 	logs.New().SetAdditionalInfo("body", body).Info("构建创建主机发送php请求的body")
-	resp, err := post(body, e.CreateAPIUrl)
+	resp, err := post(body, e.APIUriPrefix+CreateHostAPI)
 	if err != nil {
 		fmt.Println("创建主机失败", err)
 		fmt.Println(resp.String())

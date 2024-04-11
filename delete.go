@@ -17,7 +17,7 @@ func (e *ECS) Delete() (*Response, error) {
 	}
 	times := time.Now().Unix()
 	randStr := guid.S()
-	text := fmt.Sprintf("%d%s%s", times, randStr, e.SignSecret)
+	text := fmt.Sprintf("%d%s%s", times, randStr, e.APISignSecret)
 	newText := sorts(text)
 	ciphertext := gmd5.MustEncryptString(newText)
 	body := map[string]interface{}{
@@ -28,7 +28,7 @@ func (e *ECS) Delete() (*Response, error) {
 		"userid":     e.UserId,
 	}
 	logs.New().SetAdditionalInfo("body", body).Info("发送删除主机的时候请求的body")
-	resp, err := post(body, e.DeleteAPIUrl)
+	resp, err := post(body, e.APIUriPrefix+DeleteHostAPI)
 	if err != nil {
 		logs.New().Error("发送删除主机的时候请求失败了", err)
 		return nil, err
