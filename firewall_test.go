@@ -8,14 +8,16 @@ func TestAddFirewallACL(t *testing.T) {
 		Direction: "Inbound",
 		Action:    "Allow",
 		Protocol:  "TCP",
-		RemoteIP:  "1.1.1.2",
+		RemoteIP:  "1.1.1.1",
 		Desc:      "test",
 	}
 	newECS := ECS{
 		APIUriPrefix:  "http://www.lxy.dev.landui.cn",
 		APISignSecret: "JMY13PagXnhl3rpiI1ht1hBBOaSF7dSOf8ktJ95zmOx19PWayRlyCtCm7UT0mghJ",
-		Id:            100,
+		Id:            90,
+		UserName:      "86326328",
 	}
 
-	newECS.AddFirewallACL("86326328", "90", acl)
+	newECS.AddFirewallACL(acl)
+	newECS.DelFirewallACL(acl)
 }

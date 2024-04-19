@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	CreateHostAPI                 = "/api/interimCreate"
-	DeleteHostAPI                 = "/api/delVps"
-	GetHostStatusAPI              = "/api/getCloudStatus"
-	SetFirewallAPI                = "/lan/cloud/defaultAclRuleSet"
-	SetFirewallIPBlackWhiteAPI    = "/lan/cloud/addAclRule"
-	DeleteFirewallIPBlackWhiteAPI = ""
+	CreateHostAPI     = "/api/interimCreate"
+	DeleteHostAPI     = "/api/delVps"
+	GetHostStatusAPI  = "/api/getCloudStatus"
+	SetFirewallAPI    = "/lan/cloud/defaultAclRuleSet"
+	AddFirewallACLAPI = "/lan/cloud/addAclRule"
+	DelFirewallACLAPI = "/lan/cloud/delAclRule"
 )
 
 type ECS struct {

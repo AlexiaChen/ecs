@@ -1,7 +1,6 @@
 package ecs
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"gitlab.landui.cn/gomod/logs"
@@ -12,10 +11,10 @@ type AclData struct {
 	Direction  string `json:"direction"` // Inbound  Outbound
 	Action     string `json:"action"`    // Deny  Allow
 	Protocol   string `json:"protocol"`  // ANY  TCP ICMP UDP
-	RemoteIP   string `json:"local_ip"`
+	RemoteIP   string `json:"local_ip"`  // 10.10.1.1 10.10.0.0/24
 	RemotePort string `json:"local_port"`
 	LocalIP    string `json:"remote_ip"`
-	LocalPort  string `json:"remote_port"`
+	LocalPort  string `json:"remote_port"` // 3306 6379 1-65535
 	Desc       string `json:"desc"`
 }
 
@@ -50,20 +49,20 @@ func (e *ECS) SetFirewall(productTypeName string) error {
 }
 
 // AddFirewallACL 设置ip黑白名单
-func (e *ECS) AddFirewallACL(userName, vspId string, acl *AclData) error {
+func (e *ECS) AddFirewallACL(acl *AclData) error {
 	header := map[string]string{
 		"User-Agent":  "api-landui-lan",
 		"X-RequestAU": fmt.Sprintf("%d|\t|%s", e.UserId, e.UserName),
 	}
 	data := map[string]interface{}{
-		"username":   userName,
-		"vpsID":      vspId,
+		"username":   e.UserName,
+		"vpsID":      e.Id,
 		"aclGroupID": "0",
 		"aclData":    acl,
 	}
 	var result aclResponse
 	client := resty.New()
-	resp, err := client.R().SetHeaders(header).SetBody(data).SetResult(&result).Post(e.APIUriPrefix + SetFirewallIPBlackWhiteAPI)
+	resp, err := client.R().SetHeaders(header).SetBody(data).SetResult(&result).Post(e.APIUriPrefix + AddFirewallACLAPI)
 	if err != nil {
 		logs.New().SetAdditionalInfo("err", err.Error()).Error("设置黑白名单发送请求错误", err)
 		return fmt.Errorf("设置黑白名单发送请求错误: %s", err.Error())
@@ -71,7 +70,7 @@ func (e *ECS) AddFirewallACL(userName, vspId string, acl *AclData) error {
 	logs.New().
 		SetAdditionalInfo("header", header).
 		SetAdditionalInfo("data", data).
-		SetAdditionalInfo("url", e.APIUriPrefix+SetFirewallIPBlackWhiteAPI).
+		SetAdditionalInfo("url", e.APIUriPrefix+AddFirewallACLAPI).
 		SetAdditionalInfo("resp", resp.String()).Info("设置黑白名单记录")
 
 	if result.Code != 200 {
@@ -80,34 +79,33 @@ func (e *ECS) AddFirewallACL(userName, vspId string, acl *AclData) error {
 	return nil
 }
 
-// DeleteIPBlackWhiteListRule 删除云防火墙黑白名单
-func (e *ECS) DeleteIPBlackWhiteListRule(productTypeName string, ipList []string) error {
-
+// DelFirewallACL 设置ip黑白名单
+func (e *ECS) DelFirewallACL(acl *AclData) error {
 	header := map[string]string{
 		"User-Agent":  "api-landui-lan",
 		"X-RequestAU": fmt.Sprintf("%d|\t|%s", e.UserId, e.UserName),
 	}
-	ipListStr, _ := json.Marshal(ipList)
-	data := map[string]string{
-		"vpsname":           fmt.Sprintf("%d", e.Id),
-		"product_type_name": productTypeName,
-		"ip_list":           string(ipListStr),
+	data := map[string]interface{}{
+		"username":   e.UserName,
+		"vpsID":      e.Id,
+		"aclGroupID": "0",
+		"aclData":    acl,
 	}
+	var result aclResponse
 	client := resty.New()
-	resp, err := client.R().SetHeaders(header).SetFormData(data).Post(e.APIUriPrefix + DeleteFirewallIPBlackWhiteAPI)
+	resp, err := client.R().SetHeaders(header).SetBody(data).SetResult(&result).Post(e.APIUriPrefix + DelFirewallACLAPI)
 	if err != nil {
-		logs.New().SetAdditionalInfo("err", err.Error()).Error("删除黑白名单发送请求错误", err)
+		logs.New().SetAdditionalInfo("err", err.Error()).Error("设置黑白名单发送请求错误", err)
 		return fmt.Errorf("删除黑白名单发送请求错误: %s", err.Error())
 	}
 	logs.New().
 		SetAdditionalInfo("header", header).
 		SetAdditionalInfo("data", data).
-		SetAdditionalInfo("url", e.APIUriPrefix+DeleteFirewallIPBlackWhiteAPI).
-		SetAdditionalInfo("resp", resp.String()).Info("删除黑白名单记录")
+		SetAdditionalInfo("url", e.APIUriPrefix+DelFirewallACLAPI).
+		SetAdditionalInfo("resp", resp.String()).Info("设置黑白名单记录")
 
-	if resp.StatusCode() != 200 {
+	if result.Code != 200 {
 		return fmt.Errorf("删除黑白名单失败: %s", resp.String())
 	}
-
 	return nil
 }
