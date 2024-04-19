@@ -13,7 +13,7 @@ const (
 	DeleteHostAPI                 = "/api/delVps"
 	GetHostStatusAPI              = "/api/getCloudStatus"
 	SetFirewallAPI                = "/lan/cloud/defaultAclRuleSet"
-	SetFirewallIPBlackWhiteAPI    = ""
+	SetFirewallIPBlackWhiteAPI    = "/lan/cloud/addAclRule"
 	DeleteFirewallIPBlackWhiteAPI = ""
 )
 
