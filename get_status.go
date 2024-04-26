@@ -14,6 +14,7 @@ const (
 	VMStatusNotRun   = 0
 	VMStatusRunning  = 1
 	VMStatusPowerOFF = -2
+	VMStatusNotFound = -3
 )
 
 // GetStatus 调用PHP服务API获取云主机状态
@@ -54,11 +55,15 @@ func (e *ECS) GetStatus() (*Response, int8) {
 		return response, VMStatusUnknown
 	}
 	switch response.Info.Status {
+	case "正常":
 	case "运行中":
 		return response, VMStatusRunning
 	case "关机":
 		return response, VMStatusPowerOFF
+	case "不存在":
+		return response, VMStatusNotFound
 	default:
 		return response, VMStatusUnknown
 	}
+	return response, VMStatusNotRun
 }
