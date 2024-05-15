@@ -3,7 +3,6 @@ package ecs
 import "testing"
 
 func TestAddFirewallACL(t *testing.T) {
-	initLog()
 	acl := &AclData{
 		Direction: "Inbound",
 		Action:    "Allow",
@@ -18,6 +17,12 @@ func TestAddFirewallACL(t *testing.T) {
 		UserName:      "86326328",
 	}
 
-	newECS.AddFirewallACL(acl)
-	newECS.DelFirewallACL(acl)
+	err := newECS.AddFirewallACL(acl)
+	if err != nil {
+		t.Errorf("AddFirewallACL failed: %s", err.Error())
+	}
+	err = newECS.DelFirewallACL(acl)
+	if err != nil {
+		t.Errorf("DelFirewallACL failed: %s", err.Error())
+	}
 }
