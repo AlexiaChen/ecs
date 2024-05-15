@@ -2,8 +2,8 @@ package ecs
 
 import (
 	"fmt"
+
 	"github.com/go-resty/resty/v2"
-	"gitlab.landui.cn/gomod/logs"
 )
 
 type AclData struct {
@@ -37,14 +37,8 @@ func (e *ECS) SetFirewall(productTypeName string) error {
 	client := resty.New()
 	resp, err := client.R().SetHeaders(header).SetFormData(data).Post(e.APIUriPrefix + SetFirewallAPI)
 	if err != nil {
-		logs.New().SetAdditionalInfo("err", err.Error()).Error("设置防火墙发送请求错误", err)
-		return err
+		return fmt.Errorf("设置防火墙发送请求错误: %s resp: %s data: %+v header: %+v", err.Error(), resp.String(), data, header)
 	}
-	logs.New().
-		SetAdditionalInfo("header", header).
-		SetAdditionalInfo("data", data).
-		SetAdditionalInfo("url", e.APIUriPrefix+SetFirewallAPI).
-		SetAdditionalInfo("resp", resp.String()).Info("开通主机设置防火墙记录")
 	return nil
 }
 
@@ -64,17 +58,11 @@ func (e *ECS) AddFirewallACL(acl *AclData) error {
 	client := resty.New()
 	resp, err := client.R().SetHeaders(header).SetBody(data).SetResult(&result).Post(e.APIUriPrefix + AddFirewallACLAPI)
 	if err != nil {
-		logs.New().SetAdditionalInfo("err", err.Error()).Error("设置黑白名单发送请求错误", err)
-		return fmt.Errorf("设置黑白名单发送请求错误: %s", err.Error())
+		return fmt.Errorf("设置黑白名单发送请求错误: %s resp: %s data: %+v header: %+v", err.Error(), resp.String(), data, header)
 	}
-	logs.New().
-		SetAdditionalInfo("header", header).
-		SetAdditionalInfo("data", data).
-		SetAdditionalInfo("url", e.APIUriPrefix+AddFirewallACLAPI).
-		SetAdditionalInfo("resp", resp.String()).Info("设置黑白名单记录")
 
 	if result.Code != 200 {
-		return fmt.Errorf("设置黑白名单失败: %s", resp.String())
+		return fmt.Errorf("设置黑白名单失败: %s status code %d", resp.String(), result.Code)
 	}
 	return nil
 }
@@ -95,17 +83,11 @@ func (e *ECS) DelFirewallACL(acl *AclData) error {
 	client := resty.New()
 	resp, err := client.R().SetHeaders(header).SetBody(data).SetResult(&result).Post(e.APIUriPrefix + DelFirewallACLAPI)
 	if err != nil {
-		logs.New().SetAdditionalInfo("err", err.Error()).Error("设置黑白名单发送请求错误", err)
-		return fmt.Errorf("删除黑白名单发送请求错误: %s", err.Error())
+		return fmt.Errorf("删除黑白名单发送请求错误: %s resp: %s data: %+v header: %+v", err.Error(), resp.String(), data, header)
 	}
-	logs.New().
-		SetAdditionalInfo("header", header).
-		SetAdditionalInfo("data", data).
-		SetAdditionalInfo("url", e.APIUriPrefix+DelFirewallACLAPI).
-		SetAdditionalInfo("resp", resp.String()).Info("设置黑白名单记录")
 
 	if result.Code != 200 {
-		return fmt.Errorf("删除黑白名单失败: %s", resp.String())
+		return fmt.Errorf("删除黑白名单失败: %s status code: %d", resp.String(), result.Code)
 	}
 	return nil
 }

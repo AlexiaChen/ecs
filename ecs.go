@@ -1,11 +1,10 @@
 package ecs
 
 import (
-	"errors"
 	"fmt"
-	"github.com/go-resty/resty/v2"
-	"gitlab.landui.cn/gomod/logs"
 	"sort"
+
+	"github.com/go-resty/resty/v2"
 )
 
 const (
@@ -84,19 +83,16 @@ func unauthorizedPost(url string) (*resty.Response, error) {
 	//resp, err := client.R().SetBody(body).Post(url)
 	resp, err := client.R().Get(url)
 	if err != nil {
-		log := logs.New()
-		log.SetAdditionalInfo("resp", resp).Error("创建主机的时候出现错误", err)
-		return nil, err
+		return nil, fmt.Errorf("unauthorizedPost failed: %s resp: %s", err.Error(), resp.String())
 	}
-	return resp, err
+	return resp, nil
 }
 
 func post(body map[string]interface{}, url string) (*resty.Response, error) {
 	client := resty.New()
 	resp, err := client.R().SetBody(body).Post(url)
 	if err != nil {
-		logs.New().Error("发送到php的请求失败", err)
-		return nil, errors.New("创建云主机失败")
+		return nil, fmt.Errorf("post failed: %s resp: %s", err.Error(), resp.String())
 	}
 	return resp, err
 }

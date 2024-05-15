@@ -3,10 +3,10 @@ package ecs
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/util/guid"
-	"gitlab.landui.cn/gomod/logs"
-	"time"
 )
 
 const (
@@ -18,7 +18,7 @@ const (
 )
 
 // GetStatus 调用PHP服务API获取云主机状态
-func (e *ECS) GetStatus() (*Response, int8) {
+func (e *ECS) GetStatus() (*Response, int8, error) {
 	response := new(Response)
 	times := time.Now().Unix()
 	randStr := guid.S()
@@ -37,33 +37,29 @@ func (e *ECS) GetStatus() (*Response, int8) {
 		"id",
 		e.Id,
 	)
-	logs.New().SetAdditionalInfo("url", url).Info("获取主机状态")
+
 	resp, err := unauthorizedPost(url)
 	if err != nil {
-		log := logs.New()
-		log.SetAdditionalInfo("resp", resp).Error("获取主机状态失败", err)
-		return response, VMStatusUnknown
+		return response, VMStatusUnknown, fmt.Errorf("获取主机状态失败: %s resp: %s", err.Error(), resp.String())
 	}
 	err = json.Unmarshal(resp.Body(), response)
 	if err != nil {
-		log := logs.New()
-		log.SetAdditionalInfo("resp", resp.String()).Error("获取主机状态参数解析失败", err)
-		return response, VMStatusUnknown
+		return response, VMStatusUnknown, fmt.Errorf("获取主机状态参数解析失败: %s resp: %s", err.Error(), resp.String())
 	}
 
 	if response.Info.Status == "" {
-		return response, VMStatusUnknown
+		return response, VMStatusUnknown, nil
 	}
 	switch response.Info.Status {
 	case "正常":
 	case "运行中":
-		return response, VMStatusRunning
+		return response, VMStatusRunning, nil
 	case "关机":
-		return response, VMStatusPowerOFF
+		return response, VMStatusPowerOFF, nil
 	case "不存在":
-		return response, VMStatusNotFound
+		return response, VMStatusNotFound, nil
 	default:
-		return response, VMStatusUnknown
+		return response, VMStatusUnknown, nil
 	}
-	return response, VMStatusNotRun
+	return response, VMStatusNotRun, nil
 }
