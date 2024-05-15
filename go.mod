@@ -1,4 +1,4 @@
-module gitlab.landui.cn/gomod/ecs
+module github.com/AlexiaChen/ecs
 
 go 1.20
 
