@@ -11,10 +11,10 @@ type AclData struct {
 	Direction  string `json:"direction"` // Inbound  Outbound
 	Action     string `json:"action"`    // Deny  Allow
 	Protocol   string `json:"protocol"`  // ANY  TCP ICMP UDP
-	RemoteIP   string `json:"local_ip"`  // 10.10.1.1 10.10.0.0/24
-	RemotePort string `json:"local_port"`
-	LocalIP    string `json:"remote_ip"`
-	LocalPort  string `json:"remote_port"` // 3306 6379 1-65535
+	RemoteIP   string `json:"remote_ip"` // 10.10.1.1 10.10.0.0/24
+	RemotePort string `json:"remote_port"`
+	LocalIP    string `json:"local_ip"`
+	LocalPort  string `json:"local_port"` // 3306 6379 1-65535
 	Desc       string `json:"desc"`
 }
 
